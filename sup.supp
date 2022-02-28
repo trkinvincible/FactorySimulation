@@ -1,0 +1,18 @@
+{
+   ignore_unversioned_libs
+   Memcheck:Leak
+   ...
+   obj:./lib*.so
+   obj:*/lib*/lib*.so
+   obj:/usr/lib/x86_64-linux-gnu/libtbb.so.2
+   obj:*/lib*/libprotobuf.so
+}
+{
+   ignore_versioned_libs
+   Memcheck:Leak
+   ...
+   obj:./lib*.so
+   obj:/usr/lib/x86_64-linux-gnu/libtbb.so.2
+   obj:*/lib*/lib*.so
+   obj:*/lib*/libprotobuf.so
+}

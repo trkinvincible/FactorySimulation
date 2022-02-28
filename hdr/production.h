@@ -12,6 +12,11 @@
 #include <shared_mutex>
 #include <deque>
 #include <variant>
+#include <random>
+#include <chrono>
+
+#define GETTER(OBJ) public:\
+    const decltype(OBJ)& get##OBJ() const { return OBJ; }
 
 #include "belt.h"
 #include "worker.h"
@@ -23,49 +28,152 @@ public:
     Production(){
 
         // Assign the belt for the workers
-        for (uint8_t i = 0; i <= NO_OF_SLOTS; ++i){
+        for (uint8_t i = 0; i < NO_OF_SLOTS; ++i){
             m_WorkerPairs.emplace_back(std::make_unique<WorkerPair<NO_OF_SLOTS>>(i, *this));
         }
     }
 
+    std::future<void> getFuture() {
+
+        std::lock_guard lk(m_MuFutGuard);
+        std::promise<void> promise;
+        std::future<void> future = promise.get_future();
+        m_Promises.push_back(std::move(promise));
+
+        return future;
+    }
+
+    std::promise<void> getPromise() {
+
+        std::lock_guard lk(m_MuProGuard);
+        std::promise<void> promise;
+        std::future<void> future = promise.get_future();
+        m_Futures.push_back(std::move(future));
+
+        return promise;
+    }
+
     void Start(const std::size_t runTime){
 
-        // Trigger up all workers
+        // Trigger all workers
         for (const auto& w : m_WorkerPairs){
             w->Start();
         }
 
-        auto componentFeeder = [](){
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(0, 4);
+        std::array<uint8_t, 5> component_array{0, COMPONENT::COMPONENT_A, COMPONENT::COMPONENT_B, COMPONENT::COMPONENT_C, COMPONENT::EMPTY};
+
+        auto componentFeeder = [component_array = std::move(component_array), &rd, &distrib, &gen](){
             SlotData data;
+#if TEST
+            data.SetComponentData(COMPONENT::COMPONENT_A);
+#else
+            data.SetComponentData(component_array[distrib(gen)]);
+#endif
             return data;
         };
 
-        for (int i = 0; i < runTime; ++i){
+        /* 1. feed the belt
+         * 2. notify all workers on stand-by to work on designated slots at different cache lines simultaneously for exactly once.
+         * 3. once all workers raise done will continue loop
+         * 4. workers will take new promise after every loop while production will clear expired promises.
+         * like C++ 20 counting semaphores. life much easier.
+        */
+
+        for (std::size_t i = 0; i < runTime; ++i){
             auto component = componentFeeder();
-            auto indexToFeed = getSlotIndexAfter(m_SlotIndexFed);
-            std::unique_lock<std::shared_mutex> lk;
-            m_CondVar.wait(lk);
-            m_Belt[indexToFeed] = component;
-            lk.unlock();
-            m_CondVar.notify_all();
+            m_SlotIndexFed = getSlotIndexAfter(m_SlotIndexFed, true);
+
+            // Don't wait for workers until first feed
+            if (i != 0){
+                std::lock_guard lk(m_MuProGuard);
+                for (auto& f : m_Futures){
+                    f.get();
+                }
+                m_Futures.clear();
+            }
+            {
+                // simultaneous read  but exclusive write with shared_mutex.
+                std::unique_lock lk(m_Mu);
+
+                //std::cout << "fed in index: " << (int)m_SlotIndexFed << std::endl;
+
+                if (component.testIsEmpty()) ++m_noOfEmptyFeed;
+
+                // Atomic load/store of slots in concecutive cachelines for avoid false sharing.
+                std::atomic_store_explicit(&m_Belt[m_SlotIndexFed], component, std::memory_order_release);
+            }
+            {
+                std::lock_guard lk(m_MuFutGuard);
+                for (auto& p : m_Promises){
+                    p.set_value();
+                }
+                m_Promises.clear();
+            }
         }
-        m_Exit = true;
+
+        m_Exit.store(true, std::memory_order_relaxed);
+    }
+
+    std::size_t getNoOfWorkersWithUnfinishedProducts(){
+
+        std::size_t ret = 0;
+        for (const auto& w : m_WorkerPairs){
+            ret += w->getNoOfWorkersWithUnfinishedProducts();
+        }
+
+        return ret;
     }
 
 private:
-    std::uint8_t getSlotIndexAfter(std::int8_t currIndex) const{
-        return --currIndex < 0 ? NO_OF_SLOTS : currIndex;
+    std::uint8_t getSlotIndexAfter(std::int8_t currIndex, const bool isWrite=false) noexcept{
+
+        /*
+         * progress belt by rotating the buffer index. overridden buffer is checked for
+         * unhandled component or completed product.
+        */
+        std::uint8_t ret_index;
+        if (--currIndex < 0){
+            ret_index = NO_OF_SLOTS - 1;
+            if (isWrite){
+                SlotData* ptr = std::launder(reinterpret_cast<SlotData*>(&m_Belt[ret_index]));
+                if (ptr->AnyComponent()){
+                    ++m_noOfComponentsUnHandled;
+                }else if (!ptr->testIsEmpty()){
+                    ++m_noOfProductsFormed;
+                }
+            }
+        }else{
+            ret_index = currIndex;
+        }
+
+        return ret_index;
     }
 
-    std::int8_t m_SlotIndexFed{-1};
+    std::int8_t m_SlotIndexFed{1};
     ConveyorBelt<std::atomic<SlotData>, NO_OF_SLOTS> m_Belt;
     std::vector<std::unique_ptr<WorkerPair<NO_OF_SLOTS>>> m_WorkerPairs; // Not array intentionally
     std::shared_mutex m_Mu;
-    std::condition_variable_any m_CondVar;
 
     std::atomic_bool m_Exit;
+
+    std::size_t m_noOfProductsFormed;
+    std::size_t m_noOfComponentsUnHandled;
+    std::size_t m_noOfEmptyFeed;
 
     // just to keep less verbose
     template<std::size_t N=NO_OF_SLOTS>
     friend class Worker;
+
+    // If c++20 use counting semaphore
+    std::mutex m_MuProGuard;
+    std::deque<std::promise<void>> m_Promises;
+    std::mutex m_MuFutGuard;
+    std::deque<std::future<void>> m_Futures;
+
+    GETTER(m_noOfEmptyFeed);
+    GETTER(m_noOfProductsFormed);
+    GETTER(m_noOfComponentsUnHandled);
 };
