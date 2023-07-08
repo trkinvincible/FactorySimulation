@@ -7,12 +7,17 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-option(RUN_PROFILE "Enable profiling" OFF)
+option(RUN_UNITTEST "Enable unit-tests" OFF)
+option(RUN_PROFILE "Enable profiling" ON)
 
 if(RUN_PROFILE)
     message("profiling enabled")
     add_definitions(-DRUN_PROFILER)
     find_package(benchmark REQUIRED)
+endif()
+if(RUN_UNITTEST)
+    message("unit test enabled")
+    add_definitions(-DRUN_CATCH)
 endif()
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
@@ -29,8 +34,11 @@ SET( _SOURCES_
 
 SET( _HEADER_
 
+    ${CMAKE_CURRENT_SOURCE_DIR}/hdr/production.h
     ${CMAKE_CURRENT_SOURCE_DIR}/hdr/belt.h
     ${CMAKE_CURRENT_SOURCE_DIR}/hdr/worker.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/hdr/catch.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/hdr/catch_testcases.h
 )
 
 add_executable(${PROJECT_NAME} ${_SOURCES_} ${_HEADER_})

@@ -50,6 +50,7 @@ struct SlotData {
 */
 template<class T, std::size_t NO_OF_SLOTS>
 class ConveyorBelt {
+
 public:
     T& operator[](std::size_t pos) {
 

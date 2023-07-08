@@ -161,49 +161,50 @@ public:
             // stand-by until Belt is fed and signaled.
             m_FutureFromProd.get();
             m_FutureFromProd = std::move(m_BeltOwner.getFuture());
+            {
+                std::shared_lock lk(m_Mu);
 
-            std::shared_lock lk(m_Mu);
+                m_LastReadIndex = m_BeltOwner.getSlotIndexAfter(m_LastReadIndex);
+                if (m_LastReadIndex >= NO_OF_SLOTS)
+                    return false;
 
-            m_LastReadIndex = m_BeltOwner.getSlotIndexAfter(m_LastReadIndex);
-            if (m_LastReadIndex >= NO_OF_SLOTS)
-                return false;
+                //std::cout << "reading in index: " << (int)m_LastReadIndex << std::endl;
 
-            //std::cout << "reading in index: " << (int)m_LastReadIndex << std::endl;
-
-            // Ok to copy
-            SlotData s_cur = std::atomic_load_explicit(&m_Belt[m_LastReadIndex], std::memory_order_acquire);
-            if (s_cur.isUpdated){
-                m_PromiseToProd.set_value();
-                m_PromiseToProd = std::move(m_BeltOwner.getPromise());
-                continue;
-            }
-
-            // Will update data and isUpdated of s_cur.
-            m_WorkFlow->Process(s_cur);
-
-            if (s_cur.isUpdated){
-                // finish the work and check if can update. exactly once stratergy
-                const SlotData& s_new = std::atomic_load_explicit(&m_Belt[m_LastReadIndex], std::memory_order_acquire);
-                if (!s_new.isUpdated){
-                    // try lock is non-blocking. get ready for rollback if not lucky!!.
-                    if (m_Manager.TryLock()){
-                        std::atomic_store_explicit(&m_Belt[m_LastReadIndex], s_cur, std::memory_order_release);
-                        m_WorkFlow->Commit();
-                        m_Manager.UnLock();
-                        m_PromiseToProd.set_value();
-                        m_PromiseToProd = std::move(m_BeltOwner.getPromise());
-                        continue;
-                    }
+                // Ok to copy
+                SlotData s_cur = std::atomic_load_explicit(&m_Belt[m_LastReadIndex], std::memory_order_acquire);
+                if (s_cur.isUpdated){
+                    m_PromiseToProd.set_value();
+                    m_PromiseToProd = std::move(m_BeltOwner.getPromise());
+                    continue;
                 }
 
-                // must have followed RAII style but to keep simple.
-                m_WorkFlow->Rollback();
+                // Will update data and isUpdated of s_cur.
+                m_WorkFlow->Process(s_cur);
+
+                if (s_cur.isUpdated){
+                    // finish the work and check if can update. exactly once stratergy
+                    const SlotData& s_new = std::atomic_load_explicit(&m_Belt[m_LastReadIndex], std::memory_order_acquire);
+                    if (!s_new.isUpdated){
+                        // try lock is non-blocking. get ready for rollback if not lucky!!.
+                        if (m_Manager.TryLock()){
+                            std::atomic_store_explicit(&m_Belt[m_LastReadIndex], s_cur, std::memory_order_release);
+                            m_WorkFlow->Commit();
+                            m_Manager.UnLock();
+                            m_PromiseToProd.set_value();
+                            m_PromiseToProd = std::move(m_BeltOwner.getPromise());
+                            continue;
+                        }
+                    }
+
+                    // must have followed RAII style but to keep simple.
+                    m_WorkFlow->Rollback();
+                }
+                m_PromiseToProd.set_value();
+                if (m_BeltOwner.m_Exit.load(std::memory_order_relaxed)){
+                    return true;
+                }
+                m_PromiseToProd = std::move(m_BeltOwner.getPromise());
             }
-            m_PromiseToProd.set_value();
-            if (m_BeltOwner.m_Exit.load(std::memory_order_relaxed)){
-                return true;
-            }
-            m_PromiseToProd = std::move(m_BeltOwner.getPromise());
         }
 
         m_PromiseToProd.set_value();

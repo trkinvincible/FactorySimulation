@@ -1,0 +1,101 @@
+--------------------------------------------------------------------------------
+I1 cache:         32768 B, 64 B, 8-way associative
+D1 cache:         32768 B, 64 B, 8-way associative
+LL cache:         12582912 B, 64 B, 24-way associative
+Command:          ./factory-simulation
+Data file:        cachegrind.out.7601
+Events recorded:  Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw Bc Bcm Bi Bim
+Events shown:     Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw Bc Bcm Bi Bim
+Event sort order: Ir I1mr ILmr Dr D1mr DLmr Dw D1mw DLmw Bc Bcm Bi Bim
+Thresholds:       0.1 100 100 100 100 100 100 100 100 100 100 100 100
+Include dirs:     
+User annotated:   
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir        I1mr  ILmr  Dr        D1mr   DLmr   Dw      D1mw  DLmw  Bc      Bcm    Bi     Bim   
+--------------------------------------------------------------------------------
+4,596,002 5,515 4,092 1,147,910 27,703 10,729 486,696 6,615 4,600 691,754 33,395 29,006 3,571  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir        I1mr ILmr Dr      D1mr  DLmr  Dw      D1mw  DLmw  Bc      Bcm   Bi     Bim    file:function
+--------------------------------------------------------------------------------
+1,164,528   30   11 193,636 2,683 1,975  57,499    77    21 147,146 2,968      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-lookup.c:_dl_lookup_symbol_x
+1,067,185   71   33 360,508 6,552   965 143,318   146    64 165,155 8,558    248     4  /build/glibc-eX1tMB/glibc-2.31/elf/dl-lookup.c:do_lookup_x
+  342,473   25   25  73,919 3,726 3,094  27,720 2,035 1,238  68,985 1,216  4,278    99  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/x86_64/dl-machine.h:_dl_relocate_object
+  233,526  123   52  39,909   322     7  39,968   585   521  36,904 2,084      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:_int_malloc
+  163,913  183   81  32,648 1,014   331       0     0     0  18,707 2,009    836   602  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/strcmp.S:strcmp
+  158,907   60   24  45,691   297     0  21,962     6     0  30,570   601      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:_int_free
+  149,525   21    6  49,521 1,388   406  16,769    30     7  19,461   316      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-lookup.c:check_match
+  125,759    9    2  31,041     0     0  27,372   140   126  17,591   752      0     0  ???:void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char*>(char*, char*, std::forward_iterator_tag) [clone .constprop.0]
+  115,694   12   12  38,738 3,290 2,243   8,480     6     0  14,879   163      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/do-rel.h:_dl_relocate_object
+   98,535   19   11  26,016   165     0  10,076     0     0  18,523   551      1     1  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:malloc
+   79,865  861  590  27,571   769   140   4,411    44    14   7,524   968 19,748 2,260  ???:???
+   71,449   10   10  14,298 1,091   827      15     3     0  15,746 2,021      2     2  /build/glibc-eX1tMB/glibc-2.31/elf/dl-addr.c:_dl_addr
+   50,106    8    4  12,675   994     0   6,885     0     0   8,343   304      0     0  ???:Catch::clara::detail::Opt::~Opt()
+   46,376    7    3  10,884    23     0  11,654   161   158   3,848    27      0     0  ???:std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::vector(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&)
+   45,259    7    5  10,874   156     0      21     0     0  10,617    81      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:free
+   44,716   10    5  10,095 1,140     0   7,058     1     0   7,124   596      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:malloc_consolidate
+   41,428   17    7   8,910    43     4   5,925    81    61  10,336 2,035      0     0  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:__memcpy_avx_unaligned_erms
+   29,917   15   15   8,852    11     0   8,687   289   282   2,853   153      0     0  ???:Catch::clara::detail::Parser::Parser(Catch::clara::detail::Parser const&)
+   24,745    5    5   4,808    37    37      77     1     1   7,684   895      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-tunables.c:__GI___tunables_init
+   23,177    6    1   4,214     0     0   4,214     2     1   2,107     5      0     0  ???:operator new(unsigned long)
+   21,668   19   19   7,391   138   110   1,663   101    89   4,996   297      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-version.c:_dl_check_map_versions
+   21,469    8    2   7,644    69     0   2,440     0     0   3,903   133    324    74  ???:std::_Sp_counted_base<(__gnu_cxx::_Lock_policy)2>::_M_release()
+   19,881   14   14   5,003    47     0   8,760   625   625   1,209    93    325     1  ???:void std::vector<Catch::clara::detail::Opt, std::allocator<Catch::clara::detail::Opt> >::_M_realloc_insert<Catch::clara::detail::Opt const&>(__gnu_cxx::__normal_iterator<Catch::clara::detail::Opt*, std::vector<Catch::clara::detail::Opt, std::allocator<Catch::clara::detail::Opt> > >, Catch::clara::detail::Opt const&)
+   19,114    7    3   7,481   255     0   2,114     0     0   4,389   180      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:unlink_chunk.isra.0
+   12,558    0    0   4,186     0     0       0     0     0       0     0      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/generic/ldsodefs.h:_dl_relocate_object
+   12,160    8    8   3,552     0     0     256     0     0   3,264    53      0     0  ???:std::locale::_Impl::_M_install_facet(std::locale::id const*, std::locale::facet const*)
+   12,077   24    7   4,402   601    79     795     0     0   1,590    87      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/../elf/dl-runtime.c:_dl_fixup
+   11,971    2    2   2,982     5     0   1,724     3     2   1,713    94      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-misc.c:_dl_name_match_p
+   11,032   14    7   2,215    13     5     960     2     0   2,590   151     17     1  /build/glibc-eX1tMB/glibc-2.31/libio/fileops.c:_IO_file_xsputn@@GLIBC_2.2.5
+   10,028    5    2     830     0     0      17     0     0   2,507    33      0     0  ???:std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_create(unsigned long&, unsigned long)
+    9,800   44   27   2,161   212     1   2,714   253    29   1,300   141    142    14  ???:Worker<3ul>::Work()
+    9,048   16    4   3,306    44     0   1,914     0     0     696     7    174    50  ???:__dynamic_cast
+    8,960    4    4   3,072     4     0   1,536     0     0   1,408     7    128     1  /build/glibc-eX1tMB/glibc-2.31/wcsmbs/btowc.c:btowc
+    8,625   11    5   3,225    26     0   1,695     0     0   1,200    67      0     0  ???:std::promise<void>::~promise()
+    8,193    1    1   1,521     9     9       0     0     0   2,246   103      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-tunables.h:__GI___tunables_init
+    8,160   44   42   2,023    66     0   1,682    15     0   1,348   125    114     2  ???:Production::Start(unsigned long)
+    8,130    0    0   2,710     0     0       0     0     0       0     0      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/generic/ldsodefs.h:do_lookup_x
+    7,990    4    3   1,210    68    66       0     0     0   2,228   127      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-cache.c:_dl_cache_libcmp
+    7,118   23   22   1,670     4     1     795     6     6   1,423   113      0     0  /build/glibc-eX1tMB/glibc-2.31/elf/dl-load.c:_dl_map_object
+    6,767   11    6   2,138    12     0     957     2     0     945    35    118     1  /build/glibc-eX1tMB/glibc-2.31/libio/iofwrite.c:fwrite
+    6,726    8    4   2,147    70     0   1,158    25     0   1,104    90    756     2  ???:Catch::clara::detail::Parser::~Parser()
+    6,534   25    8   1,650    44     0   2,310    67     0     726    15      0     0  ???:Production::getFuture()
+    6,496   11    5   2,784     9     0   1,392     3     0     580    37    116     3  ???:std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)
+    6,068   14    4   7,104     7     0   7,400   128    52       0     0    148   148  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/x86_64/dl-trampoline.h:_dl_runtime_resolve_xsave
+    5,707   37   34   1,356     8     8     596    34    31     924   129     68    33  /build/glibc-eX1tMB/glibc-2.31/elf/dl-load.c:_dl_map_object_from_fd
+    5,388   18    5   1,526    38     0     537     0     0     844    22      0     0  /build/glibc-eX1tMB/glibc-2.31/nptl/../nptl/pthread_mutex_lock.c:pthread_mutex_lock
+    5,043   11    3   1,244     0     0   1,093     0     0     686    74      0     0  ???:void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<char const*>(char const*, char const*, std::forward_iterator_tag) [clone .constprop.0]
+    4,999   18    6     595    74    58       0     0     0     595   224      0     0  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/multiarch/strlen-avx2.S:__strlen_avx2
+    4,920   10    7   1,020    53     0   1,560    59     2     600    17      0     0  ???:Production::getPromise()
+    4,824   29    9     888     0     0   1,053     8     7     378    68      0     0  ???:void std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&>(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+    4,773   12    4   1,290     4     0   1,032    19    11     516    23    129     5  /build/glibc-eX1tMB/glibc-2.31/nptl/pthread_once.c:__pthread_once_slow
+    4,614    1    1       6     0     0     768   192   192     768    31      0     0  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c:arena_get2.part.0
+
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  /build/glibc-eX1tMB/glibc-2.31/elf/../elf/dl-runtime.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/generic/ldsodefs.h
+  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/x86_64/dl-machine.h
+  /build/glibc-eX1tMB/glibc-2.31/elf/../sysdeps/x86_64/dl-trampoline.h
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-addr.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-cache.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-load.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-lookup.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-misc.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-tunables.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-tunables.h
+  /build/glibc-eX1tMB/glibc-2.31/elf/dl-version.c
+  /build/glibc-eX1tMB/glibc-2.31/elf/do-rel.h
+  /build/glibc-eX1tMB/glibc-2.31/libio/fileops.c
+  /build/glibc-eX1tMB/glibc-2.31/libio/iofwrite.c
+  /build/glibc-eX1tMB/glibc-2.31/malloc/malloc.c
+  /build/glibc-eX1tMB/glibc-2.31/nptl/../nptl/pthread_mutex_lock.c
+  /build/glibc-eX1tMB/glibc-2.31/nptl/pthread_once.c
+  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S
+  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/multiarch/strlen-avx2.S
+  /build/glibc-eX1tMB/glibc-2.31/string/../sysdeps/x86_64/strcmp.S
+  /build/glibc-eX1tMB/glibc-2.31/wcsmbs/btowc.c
+
