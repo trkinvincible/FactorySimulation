@@ -1,7 +1,3 @@
-Notice: This is provided as part of the Arm Ltd recruitment process. 
-It may only be used for that purpose and must not be redistributed 
-in any way.
-
 There is a factory production line around a single conveyor belt.  
 
 Components (of type A, B & C) come onto the start of the belt at random 
